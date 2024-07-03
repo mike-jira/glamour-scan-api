@@ -1,0 +1,48 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum LoginStategy {
+  GMAIL
+  LOCAL
+  FACEBOOK
+}
+
+enum Role {
+  ADMIN
+  SUBADMIN
+  PRODUCTOWNER
+  PRODUCTOFFICER
+  USER
+}
+
+model User {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  username     String       @unique
+  email        String?      @unique
+  password     String?
+  googleId     String?      @unique
+  facebookId   String?      @unique
+  role         Role         @default(USER)
+  loginStategy LoginStategy @default(LOCAL)
+  createAt     DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  Invite       Invite[]
+}
+
+model Invite {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  token     String    @unique
+  email     String
+  createAt  DateTime  @default(now())
+  expiresAt DateTime
+  used      Boolean   @default(false)
+  useAt     DateTime?
+  usedBy    User?     @relation(fields: [userId], references: [id])
+  userId    String?   @db.ObjectId
+}
