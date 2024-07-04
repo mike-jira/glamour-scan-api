@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { PrismaClient } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { MailerService } from '../mailer/mailer.service'
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('UsersService', () => {
   let service: UsersService;
   let prisma: PrismaClient;
+  let mailerService: MailerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,8 +19,19 @@ describe('UsersService', () => {
             user: {
               create: jest.fn(),
               findUnique: jest.fn(),
-            }
-          }
+            },
+            invite: {
+              create: jest.fn(),
+              update: jest.fn(),
+              findUnique: jest.fn(),
+            },
+          },
+        },
+        {
+          provide: MailerService,
+          useValue: {
+            send: jest.fn(),
+          },
         }
       ],
     }).compile();
@@ -29,5 +42,12 @@ describe('UsersService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('create invite', () => {
+    it('should create new invite', () => {
+      const email = 'test@example.com';
+      service.createInvite();
+    });
   });
 });
