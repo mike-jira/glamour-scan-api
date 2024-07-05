@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
-export class UsersService {
+export class InvitesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createInvite(email: string, role: 'PRODUCTOWNER' | 'PRODUCTOFFICER' | 'SUBADMIN') {
@@ -33,12 +33,14 @@ export class UsersService {
     }
   }
 
-  async findAllInvite(query : Prisma.InviteWhereInput) {
+  async findAllInvite(query?: Prisma.InviteWhereInput, paginationQuery?: { page: number, limit: number }) {
+    if (paginationQuery && (paginationQuery.page || paginationQuery.limit)) {
+      
+    }
     const result = await this.prisma
       .invite
       .findMany({ where: query });
       
     return result;
   }
-
 }

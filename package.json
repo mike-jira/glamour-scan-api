@@ -28,7 +28,8 @@
     "dotenv": "^16.4.5",
     "nodemailer": "^6.9.14",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -41,6 +42,7 @@
     "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -53,8 +55,7 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.2.0",
-    "typescript": "^4.7.4",
-    "cross-env": "^7.0.3"
+    "typescript": "^4.7.4"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -72,6 +73,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "setupFiles": ["../jest.setup.ts"]
+    "setupFiles": [
+      "../jest.setup.ts"
+    ]
   }
 }
