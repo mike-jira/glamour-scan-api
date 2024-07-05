@@ -32,8 +32,9 @@ model User {
   loginStategy LoginStategy @default(LOCAL)
   createAt     DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-  Invite       Invite[]
+  useInvited   Invite[]     @relation("UsedBy")
   Company      Company[]
+  Invited      Invite[]     @relation("InvitedBy")
 }
 
 enum inviteOnlyRole {
@@ -43,18 +44,20 @@ enum inviteOnlyRole {
 }
 
 model Invite {
-  id        String         @id @default(auto()) @map("_id") @db.ObjectId
-  token     String         @unique
-  email     String
-  role      inviteOnlyRole
-  createdAt DateTime       @default(now())
-  expiresAt DateTime
-  used      Boolean        @default(false)
-  useAt     DateTime?
-  usedBy    User?          @relation(fields: [userId], references: [id])
-  userId    String?        @db.ObjectId
-  company   Company?       @relation(fields: [companyId], references: [id])
-  companyId String?        @db.ObjectId
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  token           String         @unique
+  email           String
+  role            inviteOnlyRole
+  createdAt       DateTime       @default(now())
+  expiresAt       DateTime
+  used            Boolean        @default(false)
+  useAt           DateTime?
+  usedBy          User?          @relation("UsedBy", fields: [userId], references: [id])
+  userId          String?        @db.ObjectId
+  company         Company?       @relation(fields: [companyId], references: [id])
+  companyId       String?        @db.ObjectId
+  inviteBy        User?          @relation("InvitedBy", fields: [invitedByUserId], references: [id])
+  invitedByUserId String?        @db.ObjectId
 }
 
 model Company {

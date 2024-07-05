@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../utility/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Prisma } from '@prisma/client';
 
@@ -7,13 +7,14 @@ import { Prisma } from '@prisma/client';
 export class InvitesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createInvite(email: string, role: 'PRODUCTOWNER' | 'PRODUCTOFFICER' | 'SUBADMIN') {
+  async createInvite(email: string, role: 'PRODUCTOWNER' | 'PRODUCTOFFICER' | 'SUBADMIN', company: string) {
     try {
       const result = await this.prisma.invite.create({
         data: {
           email,
           role,
           token: uuidv4(),
+          companyId: company,
           expiresAt: new Date(),
         },
       });
@@ -35,12 +36,18 @@ export class InvitesService {
 
   async findAllInvite(query?: Prisma.InviteWhereInput, paginationQuery?: { page: number, limit: number }) {
     if (paginationQuery && (paginationQuery.page || paginationQuery.limit)) {
+      const totalItems = await this.prisma.invite.count({ where: query });
+      const totalPages = Math.ceil(totalItems / paginationQuery.limit);
       
     }
     const result = await this.prisma
       .invite
       .findMany({ where: query });
       
-    return result;
+    return {
+      error: false,
+      message: 'Retrive Invite Success',
+      result,
+    };
   }
 }

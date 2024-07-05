@@ -4,9 +4,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { MailerModule } from './mailer/mailer.module';
 import { InvitesModule } from './invites/invites.module';
+import { UtilityModule } from './utility/utility.module';
 
 console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 
@@ -18,9 +17,8 @@ console.log('process.env.NODE_ENV', process.env.NODE_ENV);
     }),
     AuthModule,
     UsersModule,
-    PrismaModule,
-    MailerModule,
     InvitesModule,
+    UtilityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
