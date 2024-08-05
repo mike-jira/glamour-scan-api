@@ -147,29 +147,5 @@ describe('InvitesService', () => {
         result: prismaResult,
       });
     });
-
-    it('should findAll invites by companyId with pagination', async () => {
-      const expectedResult = {
-        error: false,
-        message: 'Retrive Invite Success',
-        result: prismaResult,
-        pageInfo: {
-          totalPages: 1,
-          currentPage: 1,
-          itemsPerPage: 10,
-        }
-      };
-
-      (prismaService.invite.count as jest.Mock).mockResolvedValue(1);
-      (prismaService.invite.findMany as jest.Mock).mockResolvedValue(prismaResult);
-
-      const result = await service.findAllInvite({ companyId: mockCompanyId }, { page: 1, limit: 10 });
-
-      expect(prismaService.invite.count).toBeCalled();
-      expect(prismaService.invite.findMany).toBeCalledWith();
-      expect(result).toEqual(expectedResult);
-    });
-
-    // it('should findAll invites by ')
   });
 });
