@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [ConfigModule],
-  providers: [MailerService, PrismaService, PaginationService]
+  providers: [MailerService, PrismaService, PaginationService],
+  exports: [MailerService, PrismaService, PaginationService],
 })
 export class UtilityModule {}
