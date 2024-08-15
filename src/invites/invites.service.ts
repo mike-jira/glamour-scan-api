@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../utility/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
-import { Prisma } from '@prisma/client';
+import { Invite, Prisma } from '@prisma/client';
 
 @Injectable()
 export class InvitesService {
@@ -49,5 +49,34 @@ export class InvitesService {
       message: 'Retrive Invite Success',
       result,
     };
+  }
+
+  async useInvite(token: string): Promise<{ error: boolean; status: number; message: string; result?: Invite }> {
+    try {
+      const invite = await this.prisma.invite.findUnique({ where: { token }});
+      if (invite === null || invite.used) {
+        return {
+          error: true,
+          status: invite?.used ? 400 : 404,
+          message: invite?.used ? 'This Invite Already Used' : 'Invite Not Existed',
+        }
+      }
+
+      const result = await this.prisma.invite.update({
+        where: { token },
+        data: {
+          used: true,
+          useAt: new Date()
+        },
+      });
+      return {
+        error: false,
+        status: 0,
+        message: 'Use Invite Successful',
+        result,
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

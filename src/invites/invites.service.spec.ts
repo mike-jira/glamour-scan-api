@@ -86,8 +86,6 @@ describe('InvitesService', () => {
     });
 
     it('should handle errors when create invite', async () => {
-      const email = 'test@example.com';
-
       (prismaService.invite.create as jest.Mock).mockRejectedValue({});
       
       const result = await service.createInvite(email, 'PRODUCTOWNER', mockCompanyId);
@@ -98,6 +96,70 @@ describe('InvitesService', () => {
         message: 'Create Invite Failed',
       });
     });
+  });
+
+  describe('use invites', () => {
+    it('should handle use invite', async () => {
+      const expectedUseAtDate = new Date();
+      const expectedData = {
+        token: mockToken,
+        role: 'PRODUCTOWNER',
+        email,
+        used: false,
+        useAt: expectedUseAtDate,
+        companyId: mockCompanyId,
+      };
+
+      (prismaService.invite.findUnique as jest.Mock).mockResolvedValue(expectedData);
+      (prismaService.invite.update as jest.Mock).mockResolvedValue({ ...expectedData, used: true });
+
+      const result = await service.useInvite(mockToken);
+
+      expect(prismaService.invite.update).toHaveBeenCalledWith({
+        where: { token: mockToken },
+        data: { used: true, useAt: expect.any(Date) }
+      });
+      expect(result).toEqual({
+        error: false,
+        status: 0,
+        message: 'Use Invite Successful',
+        result: { ...expectedData, used: true, },
+      });
+    });
+
+    it('should return error when use invite with used token', async () => {
+      const expectedData = {
+        token: mockToken,
+        role: 'PRODUCTOWNER',
+        email,
+        used: true,
+        companyId: mockCompanyId,
+      };
+
+      (prismaService.invite.findUnique as jest.Mock).mockResolvedValue(expectedData);
+
+      const result = await service.useInvite(mockToken);
+
+      expect(prismaService.invite.findUnique).toHaveBeenCalledWith({ where: { token: mockToken } });
+      expect(result).toStrictEqual({
+        error: true,
+        status: 400,
+        message: 'This Invite Already Used',
+      });
+    });
+
+    it('should return error when invite not existed', async () => {
+      (prismaService.invite.findUnique as jest.Mock).mockResolvedValue(null);
+
+      const result = await service.useInvite(mockToken);
+
+      expect(prismaService.invite.findUnique).toHaveBeenCalledWith({ where: { token: mockToken } });
+      expect(result).toStrictEqual({
+        error: true,
+        status: 404,
+        message: 'Invite Not Existed',
+      });
+    })
   });
 
   describe('findAll invites', () => {
