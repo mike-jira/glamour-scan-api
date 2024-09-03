@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CompaniesService } from './companies.service';
 import { PrismaService } from '../utility/prisma/prisma.service';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 describe('CompaniesService', () => {
   let service: CompaniesService;
@@ -151,5 +151,91 @@ describe('CompaniesService', () => {
         message: 'Update Company Failed',
       });
     });
-  })
+  });
+
+  describe('find company by id', () => {
+    let testCompanyId = 'testcompanyid';
+    let mockResult = {
+      id: 'testcompanyid',
+      name: 'Test Company Inc.',
+      owner: {
+        id: 'testownerid',
+        username: 'testowner',
+        email: 'testowner@gmail.com',
+        role: 'PRODUCTOWNER',
+        loginStategy: 'LOCAL',
+      },
+      userId: 'testownerid',
+      invite: [{
+        id: 'testinvite',
+        token: 'testinvitetoken',
+        email: 'testinviteemail',
+        role: 'PRODUCTOWNER',
+        companyId: 'testcompanyid',
+        inviteBy: {
+          id: 'superadminid',
+          username: 'superadmin',
+        },
+      }],
+    }
+
+    it('should find company using default prisma client', async () => {
+      (prismaService.company.findUnique as jest.Mock).mockResolvedValue(mockResult);
+
+      const result = await service.findById(testCompanyId);
+
+      expect(prismaService.company.findUnique).toBeCalledWith({ where: { id: testCompanyId } });
+      expect(result).toEqual({
+        status: 0,
+        error: false,
+        message: 'Company Found',
+        result: mockResult,
+      });
+
+    });
+
+    it('should find company using trasaction prisma client', async () => {
+      const prismaTransaction = {
+        company: {
+          findUnique: jest.fn().mockResolvedValue(mockResult),
+        },
+      } as unknown as Prisma.TransactionClient
+
+      const result = await service.findById(testCompanyId, prismaTransaction);
+
+      expect(prismaTransaction.company.findUnique).toBeCalledWith({ where: { id: testCompanyId } });
+      expect(result).toEqual({
+        status: 0,
+        error: false,
+        message: 'Company Found',
+        result: mockResult,
+      })
+    });
+
+    it('should handle find non existed company', async () => {
+      (prismaService.company.findUnique as jest.Mock).mockResolvedValue(null);
+
+      const result = await service.findById(testCompanyId);
+
+      expect(prismaService.company.findUnique).toBeCalledWith({ where: { id: testCompanyId } });
+      expect(result).toEqual({
+        status: 404,
+        error: true,
+        message: 'Company Not Found'
+      });
+    });
+
+    it('should handle find company error', async () => {
+      (prismaService.company.findUnique as jest.Mock).mockRejectedValue({});
+
+      const result = await service.findById(testCompanyId);
+
+      expect(prismaService.company.findUnique).toBeCalledWith({ where: { id: testCompanyId } });
+      expect(result).toEqual({
+        status: 500,
+        error: true,
+        message: 'Company Find Failed'
+      });
+    });
+  });
 });

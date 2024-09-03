@@ -51,9 +51,11 @@ export class InvitesService {
     };
   }
 
-  async useInvite(token: string): Promise<{ error: boolean; status: number; message: string; result?: Invite }> {
+  async useInvite(token: string, transaction?: Prisma.TransactionClient): Promise<{ error: boolean; status: number; message: string; result?: Invite }> {
     try {
-      const invite = await this.prisma.invite.findUnique({ where: { token }});
+      const client = transaction ? transaction : this.prisma;
+
+      const invite = await client.invite.findUnique({ where: { token }});
       if (invite === null || invite.used) {
         return {
           error: true,
@@ -62,7 +64,7 @@ export class InvitesService {
         }
       }
 
-      const result = await this.prisma.invite.update({
+      const result = await client.invite.update({
         where: { token },
         data: {
           used: true,
