@@ -26,12 +26,14 @@ export class UsersService {
       if (hashed.error) {
         return hashed;
       }
-
+      console.log('yyy')
       // update invite 
       const invite = await this.invitesService.useInvite(data.inviteToken, prisma);
+      console.log('invite', invite);
       if (invite.error) {
         return invite;
       }
+      console.log('xxx')
 
       const user = await prisma.user.create({
         data: {

@@ -117,5 +117,29 @@ describe('UsersService', () => {
         result: user,
       })
     });
+
+    it('should handle create user with error invite', async () => {
+      (authService.hashPassword as jest.Mock).mockResolvedValue({
+        error: false,
+        status: 0,
+        message: 'Hashed Successful',
+        result: {
+          hashedPassword,
+        }
+      });
+      (invitesService.useInvite as jest.Mock).mockRejectedValue({
+        status: 500,
+        error: true,
+        message: 'Use Invite Failed',
+      });
+      const result = await service.createUser({ inviteToken: invite.token, username: user.username, password });
+      console.log('result', result);
+      expect(transactionClient.user.findUnique).toBeCalledWith({ where: { username: user.username } });
+      expect(result).toEqual({
+        status: 500,
+        error: true,
+        message: 'Use Invite Failed',
+      });
+    })
   });
 });

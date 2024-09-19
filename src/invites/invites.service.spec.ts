@@ -160,6 +160,18 @@ describe('InvitesService', () => {
         message: 'Invite Not Existed',
       });
     })
+
+    it('should handle error unknow error when use invite', async () => {
+      (prismaService.invite.findUnique as jest.Mock).mockRejectedValue({});
+
+      const result = await service.useInvite(mockToken);
+
+      expect(result).toStrictEqual({
+        error: true,
+        status: 500,
+        message: 'Use Invite Failed',
+      });
+    });
   });
 
   describe('findAll invites', () => {

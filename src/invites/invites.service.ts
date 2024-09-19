@@ -78,7 +78,11 @@ export class InvitesService {
         result,
       }
     } catch (e) {
-      console.log(e);
+      return {
+        error: true,
+        status: 500,
+        message: 'Use Invite Failed',
+      };
     }
   }
 }
