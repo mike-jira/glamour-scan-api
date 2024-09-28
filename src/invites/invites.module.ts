@@ -7,5 +7,6 @@ import { UtilityModule } from 'src/utility/utility.module';
   providers: [InvitesService],
   controllers: [InvitesController],
   imports: [UtilityModule],
+  exports: [InvitesService],
 })
 export class InvitesModule {}
