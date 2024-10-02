@@ -9,8 +9,10 @@ import {
   UseInterceptors,
   Put,
   Param,
-  NotFoundException
+  NotFoundException,
+  Req
 } from '@nestjs/common';
+import { Request } from 'express';
 import { ProductsService } from './products.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { UploadService } from 'src/utility/upload/upload.service';
@@ -93,6 +95,29 @@ export class ProductsController {
 
     delete data.updatedImageIndex;
     const result = await this.productsService.update(params.id, data);
+
+    return result;
+  }
+
+  @Post(':id/scan')
+  async count(@Param('id') id: string, @Req() request: Request) {
+    const ipAddress = request.ip;
+    const result = await this.productsService.incrementScanHistory(id, ipAddress);
+
+    if (result.error) {
+      throw new InternalServerErrorException(result.message);
+    }
+
+    return result;
+  }
+
+  @Get('scan/report')
+  async getCountReport() {
+    const result = await this.productsService.scanReport();
+
+    if (result.error) {
+      throw new InternalServerErrorException(result.message);
+    }
 
     return result;
   }

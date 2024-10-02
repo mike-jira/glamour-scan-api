@@ -102,6 +102,7 @@ model ScanHistory {
   scans     Int      @default(0)
   date      DateTime @default(now())
   product   Product  @relation(fields: [productId], references: [id])
+  ipAddress String[]
 
   @@unique([productId, date])
 }
